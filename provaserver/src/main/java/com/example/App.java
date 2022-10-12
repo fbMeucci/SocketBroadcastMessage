@@ -14,23 +14,28 @@ public class App
         Socket s = ss.accept();
         System.out.println("Client connesso");
 
-        InputStreamReader in = new InputStreamReader(s.getInputStream());
-        BufferedReader br = new BufferedReader(in);
-        String peso = br.readLine();
-        System.out.println("Client peso: " + peso);
-        String altezza = br.readLine();
-        System.out.println("Client altezza: " + altezza);
-        Double bmi = Double.valueOf(peso) / (Double.valueOf(altezza) * Double.valueOf(altezza));
 
-        PrintWriter pr = new PrintWriter(s.getOutputStream());
-        pr.println("BMI: " + bmi);
-        pr.flush();
+      // per parlare
+      PrintWriter pr = new PrintWriter(s.getOutputStream(), true);
+        
+      // per ascoltare
+      BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
-        String strF = br.readLine();
-        System.out.println("Client: " + strF);
+      System.out.println(br.readLine()); // ricevo: Eccomi
+      pr.println("Dammi il tuo peso"); // invio messaggio
+      String peso = br.readLine(); // ricevo: il peso
+      System.out.println("peso ricevuto");
+      pr.println("Dammi l'altezza"); // invio messaggio
+      String altezza = br.readLine(); // ricevo: l'altezza
+      System.out.println("altezza ricevuta");
 
-        s.close();
-        ss.close();
+      Double bmi = Double.valueOf(peso) / (Double.valueOf(altezza) * Double.valueOf(altezza));
+      pr.println(bmi); // invio il bmi
+      
+      System.out.println(br.readLine()); // leggo il saluto finale e lo metto in console
+      
+      s.close();
+      ss.close();
 
     }
 }
