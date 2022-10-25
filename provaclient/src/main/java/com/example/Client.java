@@ -6,26 +6,30 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Client {
+
     public static void main(String[] args) throws Exception {
         Socket s = new Socket("localhost", 3000);
+        ServerConnection serverConn = new ServerConnection(s);
 
-        // per parlare
-        PrintWriter pr = new PrintWriter(s.getOutputStream(), true);
+        PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
 
-        // per ascoltare
-        BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        new Thread(serverConn).start();
 
-        // per la tastiera
-        BufferedReader tastiera = new BufferedReader(new InputStreamReader(System.in));
+        while (true) {
+            System.out.println("lista comandi:data, ora, client <nome>, server, echo <msg>, chiudi: ");
+            String command = keyboard.readLine();
 
-        pr.println("Eccomi");
-        System.out.println(br.readLine()); // rivevo: benvenuti dammi il tuo peso
-        pr.println(tastiera.readLine()); // leggo da tastiera il peso e lo invio
-        System.out.println(br.readLine()); // ricevo: dammi l'altezza
-        pr.println(tastiera.readLine()); // leggo da tastiera l'altezza e la invio
-        System.out.println(br.readLine()); // rivevo il BMI
-        pr.println("Grazie e ciao");
+            if (command.equalsIgnoreCase("chiudi"))
+                break;
 
+            out.println(command);
+            String serverResponse = in.readLine();
+            System.out.println("Il server dice: " + serverResponse);
+        }
+        in.close();
+        out.close();
         s.close();
     }
 }
